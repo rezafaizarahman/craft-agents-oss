@@ -2,6 +2,30 @@ export * from './craft-agent.ts';
 export * from './errors.ts';
 export * from './options.ts';
 
+// Export Copilot agent - GitHub Copilot SDK integration
+export {
+  CopilotAgent,
+  CopilotAbortReason,
+  COPILOT_MODELS,
+  DEFAULT_COPILOT_MODEL,
+  isCopilotAvailable,
+  getCopilotAuthStatus,
+  type CopilotAgentConfig,
+  type RecoveryMessage as CopilotRecoveryMessage,
+} from './copilot-agent.ts';
+
+// Export agent factory - unified interface for creating agents
+export {
+  createAgent,
+  isBackendAvailable,
+  getModelsForBackend,
+  getDefaultModelForBackend,
+  type AgentBackend,
+  type UnifiedAgentConfig,
+  type IAgent,
+  type RecoveryMessage,
+} from './agent-factory.ts';
+
 // Export session-scoped-tools - tools scoped to a specific session
 export {
   // Tool factories (creates session-scoped tools)
