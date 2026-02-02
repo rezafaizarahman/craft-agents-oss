@@ -193,7 +193,7 @@ export class CopilotAgent {
   private sessionId: string | null = null;
   private isHeadless: boolean = false;
   private lastAbortReason: CopilotAbortReason | null = null;
-  private pendingPermissions: Map<string, { resolve: (allowed: boolean, alwaysAllow?: boolean) => void }> = new Map();
+  private pendingPermissions: Map<string, { resolve: (allowed: boolean) => void }> = new Map();
   private alwaysAllowedCommands: Set<string> = new Set();
   private alwaysAllowedDomains: Set<string> = new Set();
   private sourceMcpServers: Record<string, MCPServerConfig> = {};
@@ -677,11 +677,9 @@ export class CopilotAgent {
         };
 
         // Add file attachments if any
-        if (attachments?.length) {
-          const fileAttachments = attachments.filter(a => a.type === 'text' || a.type === 'image' || a.type === 'pdf');
-          // Note: Copilot SDK handles attachments differently than Claude SDK
-          // For now, we include text content inline in the prompt
-        }
+        // Note: Copilot SDK handles attachments through the prompt text
+        // Binary attachments (images, PDFs) are already filtered out in buildTextPrompt
+        // Text content is included inline in the prompt
 
         this.currentSession.send(messageOptions);
 
@@ -746,10 +744,12 @@ export class CopilotAgent {
   /**
    * Resolve a pending permission request.
    */
-  resolvePermission(requestId: string, allowed: boolean, alwaysAllow?: boolean): void {
+  resolvePermission(requestId: string, allowed: boolean, _alwaysAllow?: boolean): void {
     const pending = this.pendingPermissions.get(requestId);
     if (pending) {
-      pending.resolve(allowed, alwaysAllow);
+      // Note: alwaysAllow could be used to add commands to alwaysAllowedCommands set
+      // For now, we just resolve the immediate request
+      pending.resolve(allowed);
       this.pendingPermissions.delete(requestId);
     }
   }
